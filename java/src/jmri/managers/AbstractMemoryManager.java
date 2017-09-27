@@ -35,7 +35,12 @@ public abstract class AbstractMemoryManager extends AbstractManager<Memory>
         if (sName.startsWith("" + getSystemPrefix() + typeLetter())) {
             return newMemory(sName, null);
         } else {
-            return newMemory(makeSystemName(sName), null);
+            String sysName = makeSystemName(sName);
+            t = getMemory(sysName.toUpperCase());
+            if (t != null) {
+                return t;
+            }
+            return newMemory(sysName, null);
         }
     }
 
@@ -46,7 +51,7 @@ public abstract class AbstractMemoryManager extends AbstractManager<Memory>
             return t;
         }
 
-        return getBySystemName(name);
+        return getBySystemName(name.toUpperCase());
     }
 
     @Override

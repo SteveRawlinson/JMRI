@@ -432,6 +432,7 @@ public class LayoutEditor extends PanelEditor implements VetoableChangeListener,
     private JCheckBoxMenuItem turnoutDrawUnselectedLegCheckBoxMenuItem = null;
     private JCheckBoxMenuItem hideTrackSegmentConstructionLinesCheckBoxMenuItem = null;
     private JCheckBoxMenuItem useDirectTurnoutControlCheckBoxMenuItem = null;
+    private JCheckBoxMenuItem suppressTrackingCheckBoxMenuItem = null;
 
     private ButtonGroup trackColorButtonGroup = null;
     private ButtonGroup trackOccupiedColorButtonGroup = null;
@@ -545,6 +546,7 @@ public class LayoutEditor extends PanelEditor implements VetoableChangeListener,
     private double xOverHWid = LayoutTurnout.xOverHWidDefault;
     private double xOverShort = LayoutTurnout.xOverShortDefault;
     private boolean useDirectTurnoutControl = false; //Uses Left click for closing points, Right click for throwing.
+    public boolean suppressTracking = false; // if true, no loco block tracking is attempted
 
     //saved state of options when panel was loaded or created
     private boolean savedEditMode = true;
@@ -2501,6 +2503,18 @@ public class LayoutEditor extends PanelEditor implements VetoableChangeListener,
             redrawPanel();
         });
         controlCheckBoxMenuItem.setSelected(allControlling());
+
+        //
+        // suppress loco block tracking
+        //
+        suppressTrackingCheckBoxMenuItem = new JCheckBoxMenuItem(Bundle.getMessage("SuppressBlockTracking"));
+        optionMenu.add(suppressTrackingCheckBoxMenuItem);
+        suppressTrackingCheckBoxMenuItem.addActionListener((ActionEvent event) -> {
+            setSuppressTracking(suppressTrackingCheckBoxMenuItem.isSelected());
+            redrawPanel();
+        });
+        suppressTrackingCheckBoxMenuItem.setSelected(suppressTracking);
+
 
         //
         //add "use direct turnout control" menu item
@@ -9412,6 +9426,12 @@ public class LayoutEditor extends PanelEditor implements VetoableChangeListener,
         useDirectTurnoutControl = boo;
         useDirectTurnoutControlCheckBoxMenuItem.setSelected(useDirectTurnoutControl);
     }
+
+    public void setSuppressTracking(boolean boo) {
+        suppressTracking = boo;
+        suppressTrackingCheckBoxMenuItem.setSelected(suppressTracking);
+    }
+
 
     //TODO: @Deprecated // Java standard pattern for boolean getters is "isShowHelpBar()"
     public boolean getDirectTurnoutControl() {

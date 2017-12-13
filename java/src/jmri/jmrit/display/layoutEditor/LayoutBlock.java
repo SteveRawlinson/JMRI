@@ -613,6 +613,17 @@ public class LayoutBlock extends AbstractNamedBean implements PropertyChangeList
         log.error("this state does nothing " + getDisplayName());
     }
 
+    // returns true if every layout panel this layoutblock is on
+    // has the suppressBlocking option set
+    public boolean getSuppressTracking() {
+        for (LayoutEditor p: panels) {
+            if (!p.suppressTracking) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Get the panel with the highest connectivity to this Layout Block
      */

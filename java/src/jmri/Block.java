@@ -651,10 +651,25 @@ public class Block extends AbstractNamedBean implements PhysicalLocationReporter
         }
     }
 
+    // Returns true is this block has a corresponding layout block and every panel
+    // including tat layout block has the option suppressTracking selected
+    private boolean suppressTracking() {
+        jmri.jmrit.display.layoutEditor.LayoutBlock lb =
+                InstanceManager.getDefault(jmri.jmrit.display.layoutEditor.LayoutBlockManager.class).getLayoutBlock(getUserName());
+        if (lb == null || lb.getSuppressTracking() == false) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Handles Block sensor going INACTIVE: this block is empty
      */
     public void goingInactive() {
+        if (suppressTracking() == false) {
+            setState(UNOCCUPIED);
+            return;
+        }
         log.debug("Block {} goes UNOCCUPIED", getDisplayName());
         int currPathCnt = paths.size();
         for (int i = 0; i < currPathCnt; i++) {
@@ -676,6 +691,10 @@ public class Block extends AbstractNamedBean implements PhysicalLocationReporter
      * from who and copy their value.
      */
     public void goingActive() {
+        if (suppressTracking() == false) {
+            setState(OCCUPIED);
+            return;
+        }
         if (getState() == OCCUPIED) {
             return;
         }

@@ -255,7 +255,7 @@ public class LocoNetThrottle extends AbstractThrottle implements SlotListener {
      */
     @SuppressFBWarnings(value = "FE_FLOATING_POINT_EQUALITY") // OK to compare floating point, notify on any change
     @Override
-    public void setSpeedSetting(float speed) {
+    public void setSpeedSetting(float speed, boolean allowAllDuplicates, boolean allowDuplicateStops) {
         log.debug("setSpeedSetting: sending speed {} to LocoNet slot {}", speed, slot.getSlot());
         if (LnConstants.CONSIST_MID == slot.consistStatus()
                 || LnConstants.CONSIST_SUB == slot.consistStatus()) {
@@ -273,7 +273,21 @@ public class LocoNetThrottle extends AbstractThrottle implements SlotListener {
         }
 
         int new_spd = intSpeed(speed);
-        if (new_spd != layout_spd) {
+
+        // decide whether we should send a loconet message
+        boolean sendMsg = false; // default - don't send a loconet message
+        if (allowAllDuplicates) {
+            // send loconet message no matter what
+            sendMsg = true;
+        } else if(allowDuplicateStops && new_spd <= 1) {
+            // send loconet message if the speed is idle or eStop, even if the new speed is the same as the existing speed
+            sendMsg = true;
+        } else if (new_spd != layout_spd) {
+            // send loconet message if new speed really is new
+            sendMsg = true;
+        }
+
+        if (sendMsg) {
             LocoNetMessage msg = new LocoNetMessage(4);
             msg.setOpCode(LnConstants.OPC_LOCO_SPD);
             msg.setElement(1, slot.getSlot());
@@ -294,6 +308,12 @@ public class LocoNetThrottle extends AbstractThrottle implements SlotListener {
         }
         record(speed);
     }
+
+    // provide defaults for above
+    public void setSpeedSetting(float speed) {
+        return setSpeedSetting(speed, false, true);
+    }
+
 
     /**
      * LocoNet actually puts forward and backward in the same message as the

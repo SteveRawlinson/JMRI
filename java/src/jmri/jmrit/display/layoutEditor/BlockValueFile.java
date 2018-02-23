@@ -184,7 +184,11 @@ public class BlockValueFile extends XmlFile {
                     log.error("IO Exception " + ioe);
                     throw (ioe);
                 }
+            } else {
+                log.debug("no values found")
             }
+        } else {
+            log.debug("no blocks");
         }
     }
 

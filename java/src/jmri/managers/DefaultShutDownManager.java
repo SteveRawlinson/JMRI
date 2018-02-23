@@ -73,6 +73,7 @@ public class DefaultShutDownManager implements ShutDownManager {
     synchronized public void register(ShutDownTask s) {
         Objects.requireNonNull(s, "Shutdown task cannot be null.");
         if (!this.tasks.contains(s)) {
+            log.debug("adding shutdown task", s.getName());
             this.tasks.add(s);
         } else {
             log.debug("already contains " + s);
@@ -86,6 +87,7 @@ public class DefaultShutDownManager implements ShutDownManager {
             return;
         }
         if (this.tasks.contains(s)) {
+            log.debug("removing shutdown task", s.getName());
             this.tasks.remove(s);
         }
     }
